@@ -3,22 +3,20 @@ import { Renderer } from 'expo-three';
 import { TweenMax } from 'gsap';
 import React, { useEffect, useState } from 'react';
 import {
-  AmbientLight,
   Box3,
   BoxGeometry,
   Fog,
   GridHelper,
   Mesh,
   MeshNormalMaterial,
-  PerspectiveCamera,
   PointLight,
   Scene,
-  SpotLight,
   Vector3,
 } from 'three';
 import Box from './atoms/Box';
 import { useGLVeiw } from '../context/GLVeiw';
 import useCameraHook from './hooks/Camera';
+import Grid from './molecules/Grid';
 
 const Game = () => {
   const { setGl, gl } = useGLVeiw();
@@ -54,17 +52,17 @@ const Game = () => {
     scene.add(new GridHelper(10, 10));
 
     // Add all necessary lights
-    const ambientLight = new AmbientLight(0x101010);
-    scene.add(ambientLight);
+    // const ambientLight = new AmbientLight(0x101010);
+    // scene.add(ambientLight);
 
     const pointLight = new PointLight(0xffffff, 2, 1000, 1);
     pointLight.position.set(0, 200, 200);
     scene.add(pointLight);
 
-    const spotLight = new SpotLight(0xffffff, 0.5);
-    spotLight.position.set(0, 500, 100);
-    spotLight.lookAt(scene.position);
-    scene.add(spotLight);
+    // const spotLight = new SpotLight(0xffffff, 0.5);
+    // spotLight.position.set(0, 500, 100);
+    // spotLight.lookAt(scene.position);
+    // scene.add(spotLight);
 
     // Add sphere object instance to our scene
     scene.add(box);
@@ -89,6 +87,9 @@ const Game = () => {
     );
 
     camera.lookAt(box.position);
+
+    // eslint-disable-next-line
+    new Grid(scene);
 
     // Render function
     const render = () => {

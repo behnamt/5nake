@@ -45,6 +45,6 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": "eslint --cache --fix"
+    "*.{ts,tsx}": "eslint --fix"
   }
 }

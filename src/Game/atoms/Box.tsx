@@ -1,9 +1,9 @@
 import { Mesh, BoxBufferGeometry, MeshStandardMaterial } from 'three';
 
 export default class Box extends Mesh {
-  constructor() {
+  constructor(width = 1) {
     super(
-      new BoxBufferGeometry(1.0, 1.0, 1.0),
+      new BoxBufferGeometry(width, width, width),
       new MeshStandardMaterial({
         color: 0xff0000,
       }),
