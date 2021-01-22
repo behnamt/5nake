@@ -18,14 +18,13 @@ import {
 } from 'three';
 import Box from './atoms/Box';
 import { useGLVeiw } from '../context/GLVeiw';
+import useCameraHook from './hooks/Camera';
 
 const Game = () => {
   const { setGl, gl } = useGLVeiw();
 
   const [box] = useState<Box>(new Box());
-  const [camera] = useState<PerspectiveCamera>(
-    new PerspectiveCamera(100, 0.4, 0.01, 1000),
-  );
+  const { camera } = useCameraHook();
 
   const move = distance => {
     TweenMax.to(box.position, 0.2, {
