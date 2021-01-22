@@ -19,7 +19,7 @@ import useCameraHook from './hooks/Camera';
 import Grid from './molecules/Grid';
 
 const Game = () => {
-  const { setGl, gl } = useGLVeiw();
+  const { gl, createScene, scene, renderer } = useGLVeiw();
 
   const [box] = useState<Box>(new Box());
   const { camera } = useCameraHook();
@@ -34,57 +34,10 @@ const Game = () => {
     });
   };
 
-  const onContextCreate = async _gl => {
-    const cameraInitialPositionX = 0;
-    const cameraInitialPositionY = 2;
-    const cameraInitialPositionZ = 10;
-
-    const { drawingBufferWidth: width, drawingBufferHeight: height } = _gl;
-
-    // Renderer declaration and set properties
-    const renderer = new Renderer({ gl: _gl });
-    renderer.setSize(width, height);
-    renderer.setClearColor('#fff');
-
-    // Scene declaration, add a fog, and a grid helper to see axes dimensions
-    const scene = new Scene();
-    scene.fog = new Fog('#3A96C4', 1, 10000);
-    scene.add(new GridHelper(10, 10));
-
-    // Add all necessary lights
-    // const ambientLight = new AmbientLight(0x101010);
-    // scene.add(ambientLight);
-
+  const onContextCreate = async () => {
     const pointLight = new PointLight(0xffffff, 2, 1000, 1);
     pointLight.position.set(0, 200, 200);
     scene.add(pointLight);
-
-    // const spotLight = new SpotLight(0xffffff, 0.5);
-    // spotLight.position.set(0, 500, 100);
-    // spotLight.lookAt(scene.position);
-    // scene.add(spotLight);
-
-    // Add sphere object instance to our scene
-    scene.add(box);
-
-    const cube = new Mesh(
-      new BoxGeometry(0.5, 0.5, 0.5),
-      new MeshNormalMaterial({}),
-    );
-
-    cube.geometry.computeBoundingBox();
-    const cubeBBox = new Box3(new Vector3(), new Vector3());
-
-    const boxBBox = new Box3(new Vector3(), new Vector3());
-    // console.log(box.geometry)
-
-    scene.add(cube);
-    // Set camera position and look to sphere
-    camera.position.set(
-      cameraInitialPositionX,
-      cameraInitialPositionY,
-      cameraInitialPositionZ,
-    );
 
     camera.lookAt(box.position);
 
@@ -96,27 +49,18 @@ const Game = () => {
       requestAnimationFrame(render);
       renderer.render(scene, camera);
 
-      cubeBBox.setFromObject(cube);
-      boxBBox.setFromObject(box);
-
-      // if (cubeBBox.intersectsBox(boxBBox)) {
-      //   console.log('HIT');
-      // } else {
-      //   console.log('NOT')
-      // }
-
-      _gl.endFrameEXP();
+      gl.endFrameEXP();
     };
     render();
   };
 
   useEffect(() => {
-    if (gl) {
-      onContextCreate(gl);
+    if (scene) {
+      onContextCreate();
     }
-  }, [gl]);
+  }, [scene]);
 
-  return <GLView style={{ flex: 1 }} onContextCreate={setGl} />;
+  return <GLView style={{ flex: 1 }} onContextCreate={createScene} />;
 };
 
 export default Game;
