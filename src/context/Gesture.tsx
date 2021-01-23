@@ -1,19 +1,8 @@
-import React, {
-  useState,
-  useContext,
-  useEffect,
-  PropsWithChildren,
-} from 'react';
-import { View } from 'react-native';
+import React, { useState, useContext, PropsWithChildren } from 'react';
 import { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
+import { useThrottleCallback } from '@react-hook/throttle';
+import { Swipe } from '../@types/Gesture';
 import { getAngleDeg } from '../utils/Math';
-
-enum Swipe {
-  Left = 'left',
-  Up = 'up',
-  Right = 'right',
-  Down = 'down',
-}
 
 const MIN_VELOCITY = 10;
 
@@ -38,7 +27,7 @@ const useGestureProvider = (): IGestureContext => {
     setCurrentSwipe(null);
   };
 
-  const onGestureEvent = ({ nativeEvent }: PanGestureHandlerGestureEvent) => {
+  const throttledSetCurrentSwipe = useThrottleCallback(nativeEvent => {
     if (
       Math.abs(nativeEvent.velocityX) < MIN_VELOCITY ||
       Math.abs(nativeEvent.velocityY) < MIN_VELOCITY ||
@@ -47,7 +36,6 @@ const useGestureProvider = (): IGestureContext => {
     ) {
       return;
     }
-
     const gestureAngel = getAngleDeg(nativeEvent);
     if (Math.abs(gestureAngel) > 35 && Math.abs(gestureAngel) < 55) {
       return;
@@ -75,6 +63,10 @@ const useGestureProvider = (): IGestureContext => {
     ) {
       setCurrentSwipe(Swipe.Right);
     }
+  }, 10);
+
+  const onGestureEvent = ({ nativeEvent }: PanGestureHandlerGestureEvent) => {
+    throttledSetCurrentSwipe(nativeEvent);
   };
 
   return {
