@@ -5,6 +5,9 @@ import { Swipe } from '../@types/Gesture';
 import { getAngleDeg } from '../utils/Math';
 
 const MIN_VELOCITY = 10;
+const SWIPE_FPS = 30;
+const MAX_SMALL_ANGLE = 35;
+const MIN_BIG_ANGLE = 55;
 
 interface IGestureContext {
   currentSwipe: Swipe | null;
@@ -37,33 +40,36 @@ const useGestureProvider = (): IGestureContext => {
       return;
     }
     const gestureAngel = getAngleDeg(nativeEvent);
-    if (Math.abs(gestureAngel) > 35 && Math.abs(gestureAngel) < 55) {
+    if (
+      Math.abs(gestureAngel) > MAX_SMALL_ANGLE &&
+      Math.abs(gestureAngel) < MIN_BIG_ANGLE
+    ) {
       return;
     }
     if (
       nativeEvent.translationX <= 0 &&
-      gestureAngel < 35 &&
-      gestureAngel > -35
+      gestureAngel < MAX_SMALL_ANGLE &&
+      gestureAngel > -MAX_SMALL_ANGLE
     ) {
       setCurrentSwipe(Swipe.Left);
     } else if (
       nativeEvent.translationY <= 0 &&
-      (gestureAngel > 55 || gestureAngel < -55)
+      (gestureAngel > MIN_BIG_ANGLE || gestureAngel < -MIN_BIG_ANGLE)
     ) {
       setCurrentSwipe(Swipe.Up);
     } else if (
       nativeEvent.translationY >= 0 &&
-      (gestureAngel > 55 || gestureAngel < -55)
+      (gestureAngel > MIN_BIG_ANGLE || gestureAngel < -MIN_BIG_ANGLE)
     ) {
       setCurrentSwipe(Swipe.Down);
     } else if (
       nativeEvent.translationX >= 0 &&
-      gestureAngel < 35 &&
-      gestureAngel > -35
+      gestureAngel < MAX_SMALL_ANGLE &&
+      gestureAngel > -MAX_SMALL_ANGLE
     ) {
       setCurrentSwipe(Swipe.Right);
     }
-  }, 10);
+  }, SWIPE_FPS);
 
   const onGestureEvent = ({ nativeEvent }: PanGestureHandlerGestureEvent) => {
     throttledSetCurrentSwipe(nativeEvent);

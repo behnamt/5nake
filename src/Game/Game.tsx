@@ -1,38 +1,40 @@
 import { GLView } from 'expo-gl';
-import { Renderer } from 'expo-three';
 import { TweenMax } from 'gsap';
 import React, { useEffect, useState } from 'react';
-import {
-  Box3,
-  BoxGeometry,
-  Fog,
-  GridHelper,
-  Mesh,
-  MeshNormalMaterial,
-  PointLight,
-  Scene,
-  Vector3,
-} from 'three';
+import { PointLight } from 'three';
 import Box from './atoms/Box';
 import { useGLVeiw } from '../context/GLVeiw';
-import useCameraHook from './hooks/Camera';
 import Grid from './molecules/Grid';
+import { useGesture } from '../context/Gesture';
+import { Swipe } from '../@types/Gesture';
+import { useCamera } from '../context/Camera';
 
 const Game = () => {
   const { gl, createScene, scene, renderer } = useGLVeiw();
 
   const [box] = useState<Box>(new Box());
-  const { camera } = useCameraHook();
+  const { camera } = useCamera();
+  const { currentSwipe, consumeSwipe } = useGesture();
 
-  const move = distance => {
-    TweenMax.to(box.position, 0.2, {
-      z: box.position.z + distance,
-    });
+  const move = (direction: Swipe) => {
+    const multiplyer =
+      direction === Swipe.Right || direction === Swipe.Up ? -1 : 1;
+    const axis =
+      direction === Swipe.Left || direction === Swipe.Right ? 'x' : 'y';
+    console.log(axis, camera.position[axis] + 1 * multiplyer);
 
     TweenMax.to(camera.position, 0.2, {
-      z: camera.position.z + distance,
+      [axis]: camera.position[axis] + 1 * multiplyer,
     });
   };
+
+  // TODO: this is just for demo, remove!
+  useEffect(() => {
+    if (currentSwipe) {
+      consumeSwipe();
+      move(currentSwipe);
+    }
+  }, [currentSwipe]);
 
   const onContextCreate = async () => {
     const pointLight = new PointLight(0xffffff, 2, 1000, 1);
